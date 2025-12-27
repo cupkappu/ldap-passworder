@@ -1,0 +1,47 @@
+services:
+  ldap-passworder:
+    build: .
+    container_name: ldap-passworder
+    ports:
+      - "3000:3000"
+    environment:
+      # LDAP服务器配置
+      LDAP_URL: ldap://your-ldap-server:389
+      LDAP_BASE_DN: dc=example,dc=com
+      LDAP_ADMIN_DN: cn=admin,dc=example,dc=com
+      LDAP_ADMIN_PASSWORD: your_admin_password
+      
+      # 用户搜索配置
+      LDAP_USER_SEARCH_BASE: ou=users,dc=example,dc=com
+      LDAP_USER_SEARCH_FILTER: (uid={username})
+      
+      # 应用配置
+      NEXT_PUBLIC_APP_NAME: LDAP密码修改工具
+    restart: unless-stopped
+    networks:
+      - ldap-network
+
+  # 可选：如果你需要一个测试用的LDAP服务器
+  openldap:
+    image: osixia/openldap:latest
+    container_name: openldap-server
+    ports:
+      - "389:389"
+      - "636:636"
+    environment:
+      LDAP_ORGANISATION: "Example Inc."
+      LDAP_DOMAIN: "example.com"
+      LDAP_ADMIN_PASSWORD: "admin_password"
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+    networks:
+      - ldap-network
+
+networks:
+  ldap-network:
+    driver: bridge
+
+volumes:
+  ldap_data:
+  ldap_config:
