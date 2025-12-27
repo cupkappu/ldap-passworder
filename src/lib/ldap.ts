@@ -65,7 +65,7 @@ function searchUserDN(
       let userDN: string | null = null;
 
       res.on('searchEntry', (entry) => {
-        userDN = entry.objectName || null;
+        userDN = entry.objectName?.toString() || null;
       });
 
       res.on('error', (err) => {
@@ -90,9 +90,12 @@ async function verifyUserPassword(
   const client = createClient(url);
   
   try {
+    console.log('尝试验证用户密码，DN:', userDN);
     await bindClient(client, userDN, password);
+    console.log('用户密码验证成功');
     return true;
   } catch (error) {
+    console.error('用户密码验证失败:', error);
     return false;
   } finally {
     client.unbind();
@@ -141,8 +144,10 @@ export async function changePassword(
     await bindClient(adminClient, config.adminDN, config.adminPassword);
 
     // 2. 搜索用户DN
-    const filter = config.userSearchFilter.replace('{username}', request.username);
+    const filter = config.userSearchFilter.replace(/{username}/g, request.username);
+    console.log('搜索用户，filter:', filter, 'base:', config.userSearchBase);
     const userDN = await searchUserDN(adminClient, config.userSearchBase, filter);
+    console.log('找到用户 DN:', userDN);
 
     if (!userDN) {
       return {
