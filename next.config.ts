@@ -4,6 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  basePath: process.env.BASE_PATH || '',
   output: 'standalone',
   // 允许连接到外部LDAP服务器
   experimental: {
