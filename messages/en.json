@@ -1,0 +1,22 @@
+{
+  "title": "LDAP Password Change",
+  "subtitle": "Please enter your username and password information",
+  "form": {
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password (at least 8 characters)",
+    "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Re-enter new password",
+    "submit": "Change Password",
+    "submitting": "Processing..."
+  },
+  "messages": {
+    "networkError": "Network error, please try again later"
+  },
+  "footer": {
+    "requirement": "Password requirement: at least 8 characters"
+  }
+}

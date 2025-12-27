@@ -1,0 +1,22 @@
+{
+  "title": "LDAP密码修改",
+  "subtitle": "请输入您的用户名和密码信息",
+  "form": {
+    "username": "用户名",
+    "usernamePlaceholder": "请输入用户名",
+    "currentPassword": "当前密码",
+    "currentPasswordPlaceholder": "请输入当前密码",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "请输入新密码（至少8位）",
+    "confirmPassword": "确认新密码",
+    "confirmPasswordPlaceholder": "请再次输入新密码",
+    "submit": "修改密码",
+    "submitting": "处理中..."
+  },
+  "messages": {
+    "networkError": "网络错误，请稍后重试"
+  },
+  "footer": {
+    "requirement": "密码要求：至少8个字符"
+  }
+}
