@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
@@ -15,6 +15,17 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    // Try to read cookie set by middleware to pre-fill username
+    const match = document.cookie.match(/(?:^|;\s*)remote-user=([^;]+)/);
+    if (match) {
+      const value = decodeURIComponent(match[1]);
+      if (!formData.username) {
+        setFormData(prev => ({ ...prev, username: value }));
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
