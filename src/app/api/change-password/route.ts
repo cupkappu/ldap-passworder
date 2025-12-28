@@ -3,6 +3,10 @@ import { changePassword, getLdapConfig } from '@/lib/ldap';
 
 export async function POST(request: NextRequest) {
   try {
+    const remoteUser = request.headers.get('Remote-user') ?? request.headers.get('remote-user') ?? request.headers.get('remote_user');
+    const remoteEmail = request.headers.get('Remote-email') ?? request.headers.get('remote-email') ?? request.headers.get('remote_email');
+    console.log(`Change-password headers: Remote-user=${remoteUser ?? '-'} Remote-email=${remoteEmail ?? '-'}`);
+
     const body = await request.json();
     const { username, currentPassword, newPassword, confirmPassword } = body;
 
