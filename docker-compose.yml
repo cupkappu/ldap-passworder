@@ -1,9 +1,9 @@
 services:
   ldap-passworder:
-    build: .
+    image: ${IMAGE:-ghcr.io/cupkappu/ldap-passworder:latest}
     container_name: ldap-passworder
     ports:
-      - "3000:3000"
+      - "3344:3000"
     env_file:
       - ./.env.local
     restart: unless-stopped

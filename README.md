@@ -1,5 +1,7 @@
 # LDAP Password Changer
 
+[中文](/README.zh.md)
+
 A small web application built with Next.js that allows users to change their LDAP password. It supports Docker-based deployments and optional SSO (via reverse proxy headers).
 
 ## Features ✅
