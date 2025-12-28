@@ -1,49 +1,63 @@
-# 构建阶段
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1.4
 
+# -----------------------------
+# Install dependencies (cached)
+# -----------------------------
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# 复制package文件
-COPY package*.json ./
+# install build tools if native modules are needed (kept minimal)
+RUN apk add --no-cache python3 make g++ bash
 
-# 安装依赖
-RUN npm ci || npm install --no-audit --no-fund --no-progress
+# copy only package manifests to leverage Docker layer caching
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 
-# 复制源代码
+# cache npm registry and node_modules between builds (requires BuildKit)
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --no-audit --no-fund --prefer-offline
+
+# -----------------------------
+# Builder stage
+# -----------------------------
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy node_modules from deps stage to avoid reinstalling
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy the rest of the source
 COPY . .
 
-# 构建应用
+# Disable Next.js telemetry during build
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the Next.js app (produces .next/standalone)
 RUN npm run build
 
-# 生产阶段
+# -----------------------------
+# Production image
+# -----------------------------
 FROM node:20-alpine AS runner
-
 WORKDIR /app
 
-# 设置环境变量
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# 创建非root用户
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create non-root user
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 
-# 复制必要文件
+# Copy only the needed artifacts from the builder
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# 设置文件权限
+# Ensure permissions are correct
 RUN chown -R nextjs:nodejs /app
 
-# 切换到非root用户
 USER nextjs
 
-# 暴露端口
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# 启动应用
 CMD ["node", "server.js"]
