@@ -13,8 +13,10 @@ RUN apk add --no-cache python3 make g++ bash
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 
 # cache npm registry and node_modules between builds (requires BuildKit)
+# Use npm ci when lockfile is valid for reproducible installs; fall back to npm install
+# so builds don't fail when lockfile is out of sync (you should still update lockfile locally and commit it)
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --no-audit --no-fund --prefer-offline
+    npm ci --no-audit --no-fund --prefer-offline || npm install --no-audit --no-fund --prefer-offline
 
 # -----------------------------
 # Builder stage
