@@ -18,5 +18,28 @@
   },
   "footer": {
     "requirement": "Password requirement: at least 8 characters"
+  },
+
+  "register": {
+    "title": "Register",
+    "subtitle": "Create a new account",
+    "form": {
+      "username": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Optional display name",
+      "email": "Email",
+      "emailPlaceholder": "Optional email address",
+      "password": "Password",
+      "passwordPlaceholder": "Enter password (at least 8 characters)",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "submit": "Register",
+      "submitting": "Registering...",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "footer": {
+      "requirement": "Password requirement: at least 8 characters"
+    }
   }
 }

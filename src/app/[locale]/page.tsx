@@ -21,9 +21,7 @@ export default function Home() {
     const match = document.cookie.match(/(?:^|;\s*)remote-user=([^;]+)/);
     if (match) {
       const value = decodeURIComponent(match[1]);
-      if (!formData.username) {
-        setFormData(prev => ({ ...prev, username: value }));
-      }
+      setFormData(prev => (prev.username ? prev : { ...prev, username: value }));
     }
   }, []);
 
@@ -54,7 +52,7 @@ export default function Home() {
       } else {
         setMessage({ type: 'error', text: data.message });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: t('messages.networkError') });
     } finally {
       setLoading(false);

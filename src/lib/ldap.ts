@@ -191,6 +191,67 @@ export async function changePassword(
 }
 
 /**
+ * 创建用户（注册）
+ */
+export interface CreateUserRequest {
+  username: string;
+  password: string;
+  email?: string;
+  cn?: string;
+  sn?: string;
+}
+
+export async function createUser(
+  config: LdapConfig,
+  request: CreateUserRequest
+): Promise<{ success: boolean; message: string }> {
+  let adminClient: Client | null = null;
+
+  try {
+    adminClient = createClient(config.url);
+    await bindClient(adminClient, config.adminDN, config.adminPassword);
+
+    // 检查用户是否已存在
+    const filter = config.userSearchFilter.replace(/{username}/g, request.username);
+    const existingDN = await searchUserDN(adminClient, config.userSearchBase, filter);
+    if (existingDN) {
+      return { success: false, message: '用户已存在' };
+    }
+
+    const userDN = `uid=${request.username},${config.userSearchBase}`;
+
+    const entry: Record<string, unknown> = {
+      objectClass: ['inetOrgPerson', 'organizationalPerson', 'person', 'top'],
+      uid: request.username,
+      cn: request.cn ?? request.username,
+      sn: request.sn ?? request.username,
+    };
+
+    if (request.email) entry.mail = request.email;
+    if (request.password) entry.userPassword = request.password;
+
+    await new Promise<void>((resolve, reject) => {
+      adminClient!.add(userDN, entry, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    return { success: true, message: '用户创建成功' };
+  } catch (error) {
+    console.error('LDAP createUser 失败:', error);
+    return { success: false, message: error instanceof Error ? error.message : '用户创建失败' };
+  } finally {
+    if (adminClient) {
+      adminClient.unbind();
+    }
+  }
+}
+
+/**
  * 获取LDAP配置
  */
 export function getLdapConfig(): LdapConfig {
